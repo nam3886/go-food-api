@@ -2,26 +2,25 @@ package restaurantbiz
 
 import (
 	"context"
-	"errors"
 
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
-type CreateRestaurant interface {
+type CreateRestaurantStore interface {
 	Create(ctx context.Context, data *restaurantmodel.RestaurantCreate) error
 }
 
-type CreateRestaurantBiz struct {
-	store CreateRestaurant
+type createRestaurantBiz struct {
+	store CreateRestaurantStore
 }
 
-func NewCreateRestaurantBiz(store CreateRestaurant) *CreateRestaurantBiz {
-	return &CreateRestaurantBiz{store: store}
+func NewCreateRestaurantBiz(store CreateRestaurantStore) *createRestaurantBiz {
+	return &createRestaurantBiz{store: store}
 }
 
-func (b *CreateRestaurantBiz) Create(ctx context.Context, data *restaurantmodel.RestaurantCreate) error {
-	if *data.Name == "" {
-		return errors.New("name can't be blank")
+func (b *createRestaurantBiz) CreateRestaurant(ctx context.Context, data *restaurantmodel.RestaurantCreate) error {
+	if err := data.Validate(); err != nil {
+		return err
 	}
 
 	err := b.store.Create(ctx, data)

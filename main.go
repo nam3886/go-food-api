@@ -11,6 +11,7 @@ import (
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
+	"simple_rest_api.com/m/component"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 	"simple_rest_api.com/m/module/restaurant/restauranttransport/ginrestaurant"
 )
@@ -52,35 +53,11 @@ func runService(db *gorm.DB) error {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
 
+	appCtx := component.NewAppContext(db)
+
 	restaurants := r.Group("/restaurants")
-	restaurants.POST("", ginrestaurant.CreateRestaurant(db))
-	restaurants.GET("", func(c *gin.Context) {
-		var data []restaurantmodel.Restaurant
-
-		type Filter struct {
-			CityId int `json:"city_id" form:"city_id"` // tag form cần khi muốn nhận giá trị từ query string với key = city_id
-		}
-
-		var filter Filter
-
-		if err := c.ShouldBind(&filter); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-		fmt.Println(filter)
-		newDb := db.Debug()
-
-		if filter.CityId > 0 {
-			newDb = newDb.Where("city_id = ?", filter.CityId)
-		}
-
-		if err := newDb.Find(&data).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, data)
-	})
+	restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))
+	restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
 	restaurants.GET("/:id", func(c *gin.Context) {
 		id, err := strconv.Atoi(c.Param("id"))
 

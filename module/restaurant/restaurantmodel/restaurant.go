@@ -1,6 +1,10 @@
 package restaurantmodel
 
-import "time"
+import (
+	"errors"
+	"strings"
+	"time"
+)
 
 // business model
 type Restaurant struct {
@@ -27,6 +31,16 @@ type RestaurantCreate struct {
 
 func (RestaurantCreate) TableName() string {
 	return "features"
+}
+
+func (r *RestaurantCreate) Validate() error {
+	name := strings.TrimSpace(*r.Name)
+
+	if len(name) == 0 {
+		return errors.New("restaurant name cannot be blank")
+	}
+
+	return nil
 }
 
 type RestaurantUpdate struct {

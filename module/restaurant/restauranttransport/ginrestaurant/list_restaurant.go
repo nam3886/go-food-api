@@ -11,24 +11,33 @@ import (
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
-func CreateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
+func ListRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var data restaurantmodel.RestaurantCreate
+		var filter restaurantmodel.Filter
 
-		if err := c.ShouldBind(&data); err != nil {
-			// bản chất gin.H là map[string]interface{}
+		if err := c.ShouldBind(&filter); err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
+
+		var paging common.Paging
+
+		if err := c.ShouldBind(&paging); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		paging.Fulfill()
 
 		store := restaturantstorage.NewSqlStore(appCtx.GetMainDBConnection())
-		biz := restaurantbiz.NewCreateRestaurantBiz(store)
+		biz := restaurantbiz.NewListRestaurantBiz(store)
+		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
 
-		if err := biz.CreateRestaurant(c.Request.Context(), &data); err != nil {
+		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
+		c.JSON(http.StatusOK, common.NewSuccessResponse(result, paging, filter))
 	}
 }
