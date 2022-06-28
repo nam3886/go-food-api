@@ -5,14 +5,12 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"simple_rest_api.com/m/component"
-	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 	"simple_rest_api.com/m/module/restaurant/restauranttransport/ginrestaurant"
 )
 
@@ -58,60 +56,9 @@ func runService(db *gorm.DB) error {
 	restaurants := r.Group("/restaurants")
 	restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))
 	restaurants.GET("", ginrestaurant.ListRestaurant(appCtx))
-	restaurants.GET("/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		var data restaurantmodel.Restaurant
-
-		if err := db.Where("id = ?", id).First(&data).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, data)
-	})
-	restaurants.PUT("/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		var data restaurantmodel.Restaurant
-
-		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		if err := db.Where("id = ?", id).Updates(&data).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, data)
-	})
-	restaurants.DELETE("/:id", func(c *gin.Context) {
-		id, err := strconv.Atoi(c.Param("id"))
-
-		if err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		if err := db.Where("id = ?", id).Delete(&restaurantmodel.Restaurant{}).Error; err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"data": "ok"})
-	})
+	restaurants.GET("/:id", ginrestaurant.GetRestaurant(appCtx))
+	restaurants.PUT("/:id", ginrestaurant.UpdateRestaurant(appCtx))
+	restaurants.DELETE("/:id", ginrestaurant.DeleteRestaurant(appCtx))
 
 	return r.Run(fmt.Sprintf(":%s", os.Getenv("APP_PORT")))
 }

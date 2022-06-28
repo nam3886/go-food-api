@@ -6,9 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/component"
-	"simple_rest_api.com/m/module/restaurant/restaturantstorage"
 	"simple_rest_api.com/m/module/restaurant/restaurantbiz"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
+	"simple_rest_api.com/m/module/restaurant/restaurantstorage"
 )
 
 func CreateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
@@ -21,7 +21,7 @@ func CreateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		store := restaturantstorage.NewSqlStore(appCtx.GetMainDBConnection())
+		store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewCreateRestaurantBiz(store)
 
 		if err := biz.CreateRestaurant(c.Request.Context(), &data); err != nil {

@@ -2,6 +2,7 @@ package ginrestaurant
 
 import (
 	"net/http"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
 	"simple_rest_api.com/m/common"
@@ -11,33 +12,31 @@ import (
 	"simple_rest_api.com/m/module/restaurant/restaurantstorage"
 )
 
-func ListRestaurant(appCtx component.AppContext) gin.HandlerFunc {
+func UpdateRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 	return func(c *gin.Context) {
-		var filter restaurantmodel.Filter
-
-		if err := c.ShouldBind(&filter); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		var paging common.Paging
-
-		if err := c.ShouldBind(&paging); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
-		paging.Fulfill()
-
-		store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
-		biz := restaurantbiz.NewListRestaurantBiz(store)
-		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
+		id, err := strconv.Atoi(c.Param("id"))
 
 		if err != nil {
 			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, common.NewSuccessResponse(result, paging, filter))
+		var data restaurantmodel.RestaurantUpdate
+
+		if err := c.ShouldBind(&data); err != nil {
+			// bản chất gin.H là map[string]interface{}
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
+		biz := restaurantbiz.NewUpdateRestaurantBiz(store)
+
+		if err := biz.UpdateRestaurant(c.Request.Context(), id, &data); err != nil {
+			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
 	}
 }

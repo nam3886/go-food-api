@@ -1,4 +1,4 @@
-package restaturantstorage
+package restaurantstorage
 
 import (
 	"context"
