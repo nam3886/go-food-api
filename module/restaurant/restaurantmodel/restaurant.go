@@ -12,9 +12,11 @@ const EntityName = "Restaurant"
 // business model
 type Restaurant struct {
 	common.SQLModel `json:",inline"`
-	Slug            string `json:"slug"`
-	Name            string `json:"name" gorm:"column:name"` // chỉ định tên cột
-	CityId          int    `json:"city_id,omitempty" gorm:"default:NULL"`
+	Slug            string         `json:"slug"`
+	Name            string         `json:"name" gorm:"column:name"` // chỉ định tên cột
+	CityId          int            `json:"city_id,omitempty" gorm:"default:NULL"`
+	Logo            *common.Image  `json:"logo" gorm:"default:NULL"`
+	Cover           *common.Images `json:"cover" gorm:"default:NULL"`
 }
 
 // đặt tên cho table, nếu ko có sẽ lấy mặc định như bên model laravel
@@ -23,10 +25,12 @@ func (Restaurant) TableName() string {
 }
 
 type RestaurantCreate struct {
-	common.SQLModel `json:",inline"`
-	Slug            string  `json:"slug"`
-	Name            *string `json:"name" gorm:"column:name"`
-	CityId          int     `json:"city_id,omitempty" gorm:"default:NULL"`
+	Active *bool          `json:"active,omitempty" gorm:"default:1"`
+	Slug   string         `json:"slug"`
+	Name   *string        `json:"name" gorm:"column:name"`
+	CityId int            `json:"city_id,omitempty" gorm:"default:NULL"`
+	Logo   *common.Image  `json:"logo" gorm:"default:NULL"`
+	Cover  *common.Images `json:"cover" gorm:"default:NULL"`
 }
 
 func (RestaurantCreate) TableName() string {
@@ -44,10 +48,12 @@ func (r *RestaurantCreate) Validate() error {
 }
 
 type RestaurantUpdate struct {
-	common.SQLModel `json:",inline"`
-	Slug            string  `json:"slug"`
-	Name            *string `json:"name" gorm:"column:name"`
-	CityId          int     `json:"city_id,omitempty" gorm:"default:NULL"`
+	Active *bool          `json:"active,omitempty" gorm:"default:1"`
+	Slug   string         `json:"slug"`
+	Name   *string        `json:"name" gorm:"column:name"`
+	CityId int            `json:"city_id,omitempty" gorm:"default:NULL"`
+	Logo   *common.Image  `json:"logo" gorm:"default:NULL"`
+	Cover  *common.Images `json:"cover" gorm:"default:NULL"`
 }
 
 func (RestaurantUpdate) TableName() string {
