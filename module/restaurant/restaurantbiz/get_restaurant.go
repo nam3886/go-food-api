@@ -4,6 +4,7 @@ import (
 	"context"
 
 	// "simple_rest_api.com/m/common"
+	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
@@ -27,11 +28,12 @@ func (b *getRestaurantBiz) GetRestaurant(ctx context.Context, id int) (*restaura
 	data, err := b.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		// if err != common.RecordNotFound {
-		// 	return nil, common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
-		// }
+		if err != common.RecordNotFound {
+			return nil, common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
+		}
 
-		// return nil, common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
+		return nil, common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
+		// ở đây có thể là lỗi do db connection => có thể báo lỗi khác
 	}
 
 	return data, err

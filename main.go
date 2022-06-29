@@ -11,6 +11,7 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"simple_rest_api.com/m/component"
+	"simple_rest_api.com/m/middleware"
 	"simple_rest_api.com/m/module/restaurant/restauranttransport/ginrestaurant"
 )
 
@@ -45,13 +46,14 @@ func connectDB() (*gorm.DB, error) {
 }
 
 func runService(db *gorm.DB) error {
+	appCtx := component.NewAppContext(db)
 	r := gin.Default()
+
+	r.Use(middleware.Recover(appCtx))
 
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
-
-	appCtx := component.NewAppContext(db)
 
 	restaurants := r.Group("/restaurants")
 	restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))

@@ -3,6 +3,7 @@ package restaurantbiz
 import (
 	"context"
 
+	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
@@ -28,14 +29,16 @@ func (b *deleteRestaurantBiz) DeleteRestaurant(ctx context.Context, id int) erro
 	_, err := b.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return err
+		if err != common.RecordNotFound {
+			return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
+		}
+
+		return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
 	}
 
-	err = b.store.Delete(ctx, id)
-
-	if err != nil {
-		return err
+	if err = b.store.Delete(ctx, id); err != nil {
+		return common.ErrCannotDeleteEntity(restaurantmodel.EntityName, err)
 	}
 
-	return err
+	return nil
 }

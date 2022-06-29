@@ -3,6 +3,7 @@ package restaurantbiz
 import (
 	"context"
 
+	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
@@ -26,20 +27,22 @@ func NewUpdateRestaurantBiz(store UpdateRestaurantStore) *updateRestaurantBiz {
 
 func (b *updateRestaurantBiz) UpdateRestaurant(ctx context.Context, id int, data *restaurantmodel.RestaurantUpdate) error {
 	if err := data.Validate(); err != nil {
-		return err
+		return common.ErrCannotUpdateEntity(restaurantmodel.EntityName, err)
 	}
 
 	_, err := b.store.FindDataByCondition(ctx, map[string]interface{}{"id": id})
 
 	if err != nil {
-		return err
+		if err != common.RecordNotFound {
+			return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
+		}
+
+		return common.ErrCannotGetEntity(restaurantmodel.EntityName, err)
 	}
 
-	err = b.store.Update(ctx, id, data)
-
-	if err != nil {
-		return err
+	if err = b.store.Update(ctx, id, data); err != nil {
+		return common.ErrCannotUpdateEntity(restaurantmodel.EntityName, err)
 	}
 
-	return err
+	return nil
 }
