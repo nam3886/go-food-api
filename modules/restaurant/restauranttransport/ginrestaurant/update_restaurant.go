@@ -7,9 +7,9 @@ import (
 	"github.com/gin-gonic/gin"
 	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/component"
-	"simple_rest_api.com/m/module/restaurant/restaurantbiz"
-	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
-	"simple_rest_api.com/m/module/restaurant/restaurantstorage"
+	"simple_rest_api.com/m/modules/restaurant/restaurantbiz"
+	"simple_rest_api.com/m/modules/restaurant/restaurantmodel"
+	"simple_rest_api.com/m/modules/restaurant/restaurantstorage"
 )
 
 func UpdateRestaurant(appCtx component.AppContext) gin.HandlerFunc {

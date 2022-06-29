@@ -11,8 +11,9 @@ import (
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
 	"simple_rest_api.com/m/component"
+	"simple_rest_api.com/m/component/uploadprovider"
 	"simple_rest_api.com/m/middleware"
-	"simple_rest_api.com/m/module/restaurant/restauranttransport/ginrestaurant"
+	"simple_rest_api.com/m/modules/restaurant/restauranttransport/ginrestaurant"
 )
 
 func main() {
@@ -22,13 +23,14 @@ func main() {
 		log.Fatalln("Error loading .env file")
 	}
 
+	s3Provider := getS3Provider()
 	db, err := connectDB()
 
 	if err != nil {
 		log.Fatalln(err)
 	}
 
-	if err := runService(db); err != nil {
+	if err := runService(db, s3Provider); err != nil {
 		log.Fatalln(err)
 	}
 }
@@ -45,8 +47,19 @@ func connectDB() (*gorm.DB, error) {
 	return db, err
 }
 
-func runService(db *gorm.DB) error {
-	appCtx := component.NewAppContext(db)
+func getS3Provider() uploadprovider.UploadProvider {
+	s3BucketName := os.Getenv("S3_BUCKET_NAME")
+	s3Region := os.Getenv("S3_REGION")
+	s3APIKey := os.Getenv("S3_API_KEY")
+	s3SecretKey := os.Getenv("S3_SECRET_KEY")
+	s3Domain := os.Getenv("S3_DOMAIN")
+	s3Provider := uploadprovider.NewS3Provider(s3BucketName, s3Region, s3APIKey, s3SecretKey, s3Domain)
+
+	return s3Provider
+}
+
+func runService(db *gorm.DB, upProvider uploadprovider.UploadProvider) error {
+	appCtx := component.NewAppContext(db, upProvider)
 	r := gin.Default()
 
 	r.Use(middleware.Recover(appCtx))

@@ -5,7 +5,7 @@ import (
 
 	"gorm.io/gorm"
 	"simple_rest_api.com/m/common"
-	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
+	"simple_rest_api.com/m/modules/restaurant/restaurantmodel"
 )
 
 func (s *sqlStore) FindDataByCondition(
