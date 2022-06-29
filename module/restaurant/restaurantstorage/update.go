@@ -3,6 +3,7 @@ package restaurantstorage
 import (
 	"context"
 
+	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 )
 
@@ -10,7 +11,7 @@ func (s *sqlStore) Update(ctx context.Context, id int, data *restaurantmodel.Res
 	db := s.db
 
 	if err := db.Where("id = ?", id).Updates(data).Error; err != nil {
-		return err
+		return common.ErrDB(err)
 	}
 
 	return nil

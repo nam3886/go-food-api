@@ -8,7 +8,6 @@ import (
 	"simple_rest_api.com/m/common"
 	"simple_rest_api.com/m/component"
 	"simple_rest_api.com/m/module/restaurant/restaurantbiz"
-	"simple_rest_api.com/m/module/restaurant/restaurantmodel"
 	"simple_rest_api.com/m/module/restaurant/restaurantstorage"
 )
 
@@ -21,13 +20,6 @@ func DeleteRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		var data restaurantmodel.Restaurant
-
-		if err := c.ShouldBind(&data); err != nil {
-			c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-			return
-		}
-
 		store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewDeleteRestaurantBiz(store)
 
@@ -36,6 +28,6 @@ func DeleteRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 			return
 		}
 
-		c.JSON(http.StatusOK, common.SimpleSuccessResponse(data))
+		c.JSON(http.StatusOK, common.SimpleSuccessResponse(true))
 	}
 }
