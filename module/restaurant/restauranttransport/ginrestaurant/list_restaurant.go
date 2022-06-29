@@ -29,6 +29,7 @@ func ListRestaurant(appCtx component.AppContext) gin.HandlerFunc {
 
 		store := restaurantstorage.NewSqlStore(appCtx.GetMainDBConnection())
 		biz := restaurantbiz.NewListRestaurantBiz(store)
+
 		result, err := biz.ListRestaurant(c.Request.Context(), &filter, &paging)
 
 		if err != nil {

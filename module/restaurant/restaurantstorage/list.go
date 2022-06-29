@@ -35,7 +35,7 @@ func (s *sqlStore) ListDataByCondition(
 	}
 
 	if err := db.
-		Offset(paging.Page - 1*paging.Limit).
+		Offset((paging.Page - 1) * paging.Limit).
 		Limit(paging.Limit).
 		Order("id DESC").
 		Find(&result).Error; err != nil {
