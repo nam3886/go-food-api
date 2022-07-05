@@ -14,6 +14,7 @@ import (
 	"simple_rest_api.com/m/component/uploadprovider"
 	"simple_rest_api.com/m/middleware"
 	"simple_rest_api.com/m/modules/restaurant/restauranttransport/ginrestaurant"
+	"simple_rest_api.com/m/modules/upload/uploadtransport/ginupload"
 )
 
 func main() {
@@ -67,6 +68,8 @@ func runService(db *gorm.DB, upProvider uploadprovider.UploadProvider) error {
 	r.GET("/ping", func(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{"message": "pong"})
 	})
+
+	r.POST("upload", ginupload.Upload(appCtx))
 
 	restaurants := r.Group("/restaurants")
 	restaurants.POST("", ginrestaurant.CreateRestaurant(appCtx))
